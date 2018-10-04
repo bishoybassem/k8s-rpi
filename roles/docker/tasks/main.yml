@@ -1,0 +1,14 @@
+- name: Add apt signing key for docker
+  apt_key:
+    url: https://download.docker.com/linux/debian/gpg
+
+- name: Add docker repository to apt sources
+  copy: 
+    dest: /etc/apt/sources.list.d/docker.list
+    content: deb [arch=armhf] https://download.docker.com/linux/debian stretch stable
+    mode: 0644
+
+- name: Install from apt
+  apt:
+    name: docker-ce=18.03.1~ce-0~debian
+    update_cache: yes

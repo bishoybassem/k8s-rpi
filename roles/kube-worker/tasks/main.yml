@@ -1,0 +1,14 @@
+- name: Add kube-proxy systemd service and kubelet config
+  template: 
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: 644
+  with_items:
+    - { src: kube-proxy.service.j2, dest: /etc/systemd/system/kube-proxy.service }
+    - { src: kubeconf.yml.j2, dest: /etc/kubernetes/kubeconf.yml }
+
+- name: Enable kube-proxy systemd service
+  service:
+    name: kube-proxy
+    enabled: yes
+

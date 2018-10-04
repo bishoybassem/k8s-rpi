@@ -1,0 +1,13 @@
+apiVersion: v1
+clusters:
+- cluster:
+    server: http://{{ apiserver_address }}
+  name: pi-cluster
+contexts:
+- context:
+    cluster: pi-cluster
+  name: default
+current-context: "default"
+kind: Config
+preferences: {}
+users:

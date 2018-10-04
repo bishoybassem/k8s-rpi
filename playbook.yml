@@ -1,0 +1,26 @@
+- hosts: all
+  become: yes
+  vars:
+    cluster_cidr: 10.5.0.0/16
+  roles:
+    - docker
+    - etcd
+    - flannel
+    - docker-with-flannel
+    - kube-node
+
+- hosts: worker_nodes
+  become: yes
+  vars:
+    master_ip: "{{ hostvars[groups['master_nodes'][0]].ansible_default_ipv4.address }}"
+  roles:
+    - kube-worker
+
+- hosts: master_nodes
+  become: yes
+  vars:
+    hyperkube_image_name: k8s.gcr.io/hyperkube-arm
+    hyperkube_image_tag: v1.12.0
+    apiserver_address: 127.0.0.1:8080
+  roles:
+    - kube-master

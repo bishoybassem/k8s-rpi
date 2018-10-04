@@ -1,0 +1,35 @@
+{
+  "kind": "Pod",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "kube-apiserver"
+  },
+  "spec": {
+    "hostNetwork": true,
+    "containers": [
+      {
+        "name": "kube-apiserver",
+        "image": "{{ hyperkube_image_name }}:{{ hyperkube_image_tag }}",
+        "command": [
+          "/hyperkube",
+          "apiserver",
+          "--etcd-servers=http://127.0.0.1:2379",
+          "--token-auth-file=/dev/null",
+          "--bind-address={{ ansible_default_ipv4.address }}",
+          "--disable-admission-plugins=ServiceAccount",
+          "--v=2"
+        ],
+        "livenessProbe": {
+          "httpGet": {
+            "scheme": "HTTP",
+            "host": "127.0.0.1",
+            "port": 8080,
+            "path": "/healthz"
+          },
+          "initialDelaySeconds": 90,
+          "timeoutSeconds": 15
+        }
+      }
+    ]
+  }
+}

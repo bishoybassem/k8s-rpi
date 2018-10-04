@@ -1,0 +1,48 @@
+- name: Copy kubectl binary
+  copy: 
+    src: downloads/kubectl
+    dest: /usr/bin
+    mode: 0755
+
+- name: Create home directory for kubectl
+  file:
+    path: /root/.kube
+    state: directory
+
+- name: Copy pods and config
+  template: 
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: 0644
+  with_items:
+    - { src: kube-apiserver.json.j2, dest: /etc/kubernetes/manifests/kube-apiserver.json }
+    - { src: kube-controller-manager.json.j2, dest: /etc/kubernetes/manifests/kube-controller-manager.json }
+    - { src: kube-scheduler.json.j2, dest: /etc/kubernetes/manifests/kube-scheduler.json }
+    - { src: kubeconf.yml.j2, dest: /etc/kubernetes/kubeconf.yml }
+    - { src: kubeconf.yml.j2, dest: /root/.kube/config }
+
+- name: Allow routing to loopback addresses 
+  sysctl:
+    name: net.ipv4.conf.all.route_localnet
+    value: 1
+    sysctl_set: yes
+    reload: yes
+
+- name: Install iptables-persistent from apt
+  apt:
+    name: iptables-persistent
+    update_cache: yes
+
+- name: Forward traffic from port 80 to apiserver
+  iptables:
+    table: nat
+    chain: PREROUTING
+    protocol: tcp
+    destination_port: 80
+    jump: DNAT
+    to_destination: 127.0.0.1:8080
+  register: iptables
+
+- name: Save iptables changes
+  shell: iptables-save > /etc/iptables/rules.v4
+  when: iptables.changed

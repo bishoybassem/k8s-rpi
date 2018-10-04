@@ -1,0 +1,31 @@
+{
+  "kind": "Pod",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "kube-controller-manager"
+  },
+  "spec": {
+    "hostNetwork": true,
+    "containers": [
+      {
+        "name": "kube-controller-manager",
+        "image": "{{ hyperkube_image_name }}:{{ hyperkube_image_tag }}",
+        "command": [
+          "/hyperkube",
+          "controller-manager",
+          "--master={{ apiserver_address }}"
+        ],
+        "livenessProbe": {
+          "httpGet": {
+            "scheme": "HTTP",
+            "host": "127.0.0.1",
+            "port": 10252,
+            "path": "/healthz"
+          },
+          "initialDelaySeconds": 30,
+          "timeoutSeconds": 15
+        }
+      }
+    ]
+  }
+}

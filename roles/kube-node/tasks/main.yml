@@ -1,0 +1,51 @@
+- name: Disable swapfile
+  shell: |
+    dphys-swapfile swapoff
+    dphys-swapfile uninstall
+    update-rc.d dphys-swapfile remove
+  when: ansible_swaptotal_mb > 0
+
+- name: Disable swapfile service
+  service:
+    name: "{{ item }}"
+    enabled: no
+  with_items:
+    - dphys-swapfile
+
+- name: Read kernel command line parameters
+  shell: cat /boot/cmdline.txt
+  register: cmdline
+  changed_when: False
+
+- name: Add kernel command line parameters
+  when: cmdline.stdout.find(item) == -1
+  replace:
+    path: /boot/cmdline.txt
+    regexp: $
+    replace: " {{ item }}"
+  with_items:
+    - cgroup_enable=cpuset
+    - cgroup_enable=memory
+    - cgroup_memory=1
+
+- name: Copy hyperkube binary
+  copy: 
+    src: downloads/hyperkube
+    dest: /usr/bin
+    mode: 0755
+
+- name: Add kubelet systemd service
+  copy: 
+    src: kubelet.service
+    dest: /etc/systemd/system
+    mode: 0644
+
+- name: Enable kubelet systemd service
+  service:
+    name: kubelet
+    enabled: yes
+
+- name: Create manifests directory
+  file:
+    path: /etc/kubernetes/manifests
+    state: directory

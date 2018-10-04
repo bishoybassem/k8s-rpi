@@ -1,0 +1,15 @@
+[Unit]
+Description=Flannel Overlay Network for Kubernetes
+Requires=etcd.service
+After=etcd.service
+
+[Service]
+Type=notify
+ExecStartPre=/usr/bin/etcdctl set /coreos.com/network/config '{ "Network": "{{ cluster_cidr }}", "Backend": {"Type": "vxlan"}}'
+ExecStart=/usr/bin/flanneld
+Restart=always
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
+

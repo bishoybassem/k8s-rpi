@@ -1,0 +1,13 @@
+- name: Create docker service drop-in directory
+  file:
+    path: /etc/systemd/system/docker.service.d
+    state: directory
+
+- name: Copy config
+  copy: 
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: 0644
+  with_items:
+    - { src: override.conf, dest: /etc/systemd/system/docker.service.d }
+    - { src: daemon.json, dest: /etc/docker }
