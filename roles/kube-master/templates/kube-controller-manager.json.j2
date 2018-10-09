@@ -13,7 +13,15 @@
         "command": [
           "/hyperkube",
           "controller-manager",
-          "--master={{ apiserver_address }}"
+          "--master={{ apiserver_address }}",
+          "--service-account-private-key-file=/etc/kubernetes/service-accounts-private.pem"
+        ],
+        "volumeMounts": [
+          {
+            "name": "kubeconfig",
+            "mountPath": "/etc/kubernetes",
+            "readOnly": true
+          }
         ],
         "livenessProbe": {
           "httpGet": {
@@ -24,6 +32,14 @@
           },
           "initialDelaySeconds": 30,
           "timeoutSeconds": 15
+        }
+      }
+    ],
+    "volumes": [
+      {
+        "name": "kubeconfig",
+        "hostPath": {
+          "path": "/etc/kubernetes"
         }
       }
     ]

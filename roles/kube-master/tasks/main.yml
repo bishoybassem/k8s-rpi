@@ -21,6 +21,16 @@
     - { src: kubeconf.yml.j2, dest: /etc/kubernetes/kubeconf.yml }
     - { src: kubeconf.yml.j2, dest: /root/.kube/config }
 
+- name: Generate rsa private key for service accounts
+  shell: openssl genrsa -out /etc/kubernetes/service-accounts-private.pem
+  args:
+    creates: /etc/kubernetes/service-accounts-private.pem
+
+- name: Generate rsa public key for service accounts
+  shell: openssl rsa -in /etc/kubernetes/service-accounts-private.pem -outform PEM -pubout -out /etc/kubernetes/service-accounts-public.pem
+  args:
+    creates: /etc/kubernetes/service-accounts-public.pem
+
 - name: Allow routing to loopback addresses 
   sysctl:
     name: net.ipv4.conf.all.route_localnet
