@@ -9,7 +9,7 @@ ExecStart=/usr/bin/hyperkube kubelet \
   --runtime-cgroups=/systemd/system.slice \
   --kubelet-cgroups=/systemd/system.slice \
   --pod-manifest-path=/etc/kubernetes/manifests \
-  --kubeconfig=/etc/kubernetes/kubeconf.yml
+  --kubeconfig=/etc/kubernetes/kubelet-kubeconfig.yml
 Restart=always
 RestartSec=5s
 

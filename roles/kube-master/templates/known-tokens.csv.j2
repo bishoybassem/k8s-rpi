@@ -1,0 +1,5 @@
+{% set hosts = [] %}
+{% for host in groups['worker_nodes'] %}
+{{ hostvars[host].kubelet_token }},system:node:{{hostvars[host].ansible_hostname}},{{ loop.index }},system:nodes
+{{ hostvars[host].kube_proxy_token }},system:kube-proxy,1000{{ loop.index }}
+{% endfor %}

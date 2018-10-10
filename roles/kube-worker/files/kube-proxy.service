@@ -1,0 +1,10 @@
+[Unit]
+Description=Kube proxy for Kubernetes
+
+[Service]
+ExecStart=/usr/bin/hyperkube kube-proxy --kubeconfig=/etc/kubernetes/kube-proxy-kubeconfig.yml
+Restart=always
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

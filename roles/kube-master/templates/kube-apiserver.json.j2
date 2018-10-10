@@ -14,8 +14,10 @@
           "/hyperkube",
           "apiserver",
           "--etcd-servers=http://127.0.0.1:2379",
-          "--token-auth-file=/dev/null",
           "--bind-address={{ ansible_default_ipv4.address }}",
+          "--token-auth-file=/etc/kubernetes/known-tokens.csv",
+          "--authorization-mode=Node,RBAC",
+          "--enable-admission-plugins=NodeRestriction",
           "--service-account-key-file=/etc/kubernetes/service-accounts-public.pem",
           "--v=2"
         ],

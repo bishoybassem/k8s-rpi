@@ -9,17 +9,25 @@
     path: /root/.kube
     state: directory
 
-- name: Copy pods and config
+- name: Copy pods and tokens
   template: 
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  with_items:
+    - { src: known-tokens.csv.j2, dest: /etc/kubernetes/known-tokens.csv, mode: "600" }
+    - { src: kube-apiserver.json.j2, dest: /etc/kubernetes/manifests/kube-apiserver.json, mode: "644" }
+    - { src: kube-controller-manager.json.j2, dest: /etc/kubernetes/manifests/kube-controller-manager.json, mode: "644" }
+    - { src: kube-scheduler.json.j2, dest: /etc/kubernetes/manifests/kube-scheduler.json, mode: "644" }
+
+- name: Copy kubeconfig
+  copy:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
     mode: 0644
   with_items:
-    - { src: kube-apiserver.json.j2, dest: /etc/kubernetes/manifests/kube-apiserver.json }
-    - { src: kube-controller-manager.json.j2, dest: /etc/kubernetes/manifests/kube-controller-manager.json }
-    - { src: kube-scheduler.json.j2, dest: /etc/kubernetes/manifests/kube-scheduler.json }
-    - { src: kubeconf.yml.j2, dest: /etc/kubernetes/kubeconf.yml }
-    - { src: kubeconf.yml.j2, dest: /root/.kube/config }
+    - { src: kubeconfig.yml, dest: /etc/kubernetes/kubelet-kubeconfig.yml }
+    - { src: kubeconfig.yml, dest: /root/.kube/config }
 
 - name: Generate rsa private key for service accounts
   shell: openssl genrsa -out /etc/kubernetes/service-accounts-private.pem
@@ -30,29 +38,3 @@
   shell: openssl rsa -in /etc/kubernetes/service-accounts-private.pem -outform PEM -pubout -out /etc/kubernetes/service-accounts-public.pem
   args:
     creates: /etc/kubernetes/service-accounts-public.pem
-
-- name: Allow routing to loopback addresses 
-  sysctl:
-    name: net.ipv4.conf.all.route_localnet
-    value: 1
-    sysctl_set: yes
-    reload: yes
-
-- name: Install iptables-persistent from apt
-  apt:
-    name: iptables-persistent
-    update_cache: yes
-
-- name: Forward traffic from port 80 to apiserver
-  iptables:
-    table: nat
-    chain: PREROUTING
-    protocol: tcp
-    destination_port: 80
-    jump: DNAT
-    to_destination: 127.0.0.1:8080
-  register: iptables
-
-- name: Save iptables changes
-  shell: iptables-save > /etc/iptables/rules.v4
-  when: iptables.changed

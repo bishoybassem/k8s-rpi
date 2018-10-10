@@ -1,11 +1,52 @@
-- name: Add kube-proxy systemd service and kubelet config
+- name: Generate tokens for kubelet and kube-proxy users
+  shell: "openssl rand -out {{ item }} -hex 16"
+  args:
+    creates: "{{ item }}"
+  with_items:
+    - /etc/kubernetes/kubelet-token
+    - /etc/kubernetes/kube-proxy-token
+
+- name: Restrict access to token files
+  file:
+    path: "{{ item }}"
+    owner: root
+    group: root
+    mode: 0600
+  with_items:
+    - /etc/kubernetes/kubelet-token
+    - /etc/kubernetes/kube-proxy-token
+
+- name: Read kubelet token
+  shell: cat /etc/kubernetes/kubelet-token
+  register: kubelet_token
+  changed_when: False
+
+- name: Read kube-proxy token
+  shell: cat /etc/kubernetes/kube-proxy-token
+  register: kube_proxy_token
+  changed_when: False
+
+- name: Copy kubeconfig
   template: 
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
-    mode: 644
+    mode: 0600
   with_items:
-    - { src: kube-proxy.service.j2, dest: /etc/systemd/system/kube-proxy.service }
-    - { src: kubeconf.yml.j2, dest: /etc/kubernetes/kubeconf.yml }
+    - { src: kubeconfig.yml.j2, dest: /etc/kubernetes/kubelet-kubeconfig.yml, user_name: "system:node:{{ ansible_hostname }}", user_token: "{{ kubelet_token.stdout }}" }
+    - { src: kubeconfig.yml.j2, dest: /etc/kubernetes/kube-proxy-kubeconfig.yml, user_name: "system:kube-proxy", user_token: "{{ kube_proxy_token.stdout }}" }
+
+- name: Add tokens to host facts
+  set_fact:
+    kubelet_token: "{{ kubelet_token.stdout }}"
+    kube_proxy_token: "{{ kube_proxy_token.stdout }}"
+    cacheable: true
+  changed_when: False
+
+- name: Add kube-proxy systemd service
+  copy:
+    src: kube-proxy.service
+    dest: /etc/systemd/system
+    mode: 0644
 
 - name: Enable kube-proxy systemd service
   service:
