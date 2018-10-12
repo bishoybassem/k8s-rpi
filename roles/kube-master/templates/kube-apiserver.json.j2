@@ -16,19 +16,19 @@
           "--etcd-servers=http://127.0.0.1:2379",
           "--bind-address={{ ansible_default_ipv4.address }}",
           "--service-cluster-ip-range={{ service_cluster_ip_range }}",
-          "--token-auth-file=/etc/kubernetes/known-tokens.csv",
+          "--token-auth-file=/etc/kubernetes/apiserver/known-tokens.csv",
           "--authorization-mode=Node,RBAC",
           "--enable-admission-plugins=NodeRestriction",
           "--client-ca-file=/etc/ssl/certs/ca.crt",
-          "--tls-cert-file=/etc/kubernetes/apiserver.crt",
-          "--tls-private-key-file=/etc/kubernetes/apiserver.key",
-          "--service-account-key-file=/etc/kubernetes/service-accounts-public.pem",
+          "--tls-cert-file=/etc/kubernetes/apiserver/tls.crt",
+          "--tls-private-key-file=/etc/kubernetes/apiserver/tls.key",
+          "--service-account-key-file=/etc/kubernetes/apiserver/sa-public.pem",
           "--v=2"
         ],
         "volumeMounts": [
           {
-            "name": "kubeconfig",
-            "mountPath": "/etc/kubernetes",
+            "name": "apiserver-config-files",
+            "mountPath": "/etc/kubernetes/apiserver",
             "readOnly": true
           },
           {
@@ -51,9 +51,9 @@
     ],
     "volumes": [
       {
-        "name": "kubeconfig",
+        "name": "apiserver-config-files",
         "hostPath": {
-          "path": "/etc/kubernetes"
+          "path": "/etc/kubernetes/apiserver"
         }
       },
       {

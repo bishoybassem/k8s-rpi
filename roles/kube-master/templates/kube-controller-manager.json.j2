@@ -15,12 +15,12 @@
           "controller-manager",
           "--master=127.0.0.1:8080",
           "--root-ca-file=/etc/ssl/certs/ca.crt",
-          "--service-account-private-key-file=/etc/kubernetes/service-accounts-private.pem"
+          "--service-account-private-key-file=/etc/kubernetes/controller-manager/sa-private.pem"
         ],
         "volumeMounts": [
           {
-            "name": "kubeconfig",
-            "mountPath": "/etc/kubernetes",
+            "name": "controller-manager-config-files",
+            "mountPath": "/etc/kubernetes/controller-manager",
             "readOnly": true
           },
           {
@@ -43,9 +43,9 @@
     ],
     "volumes": [
       {
-        "name": "kubeconfig",
+        "name": "controller-manager-config-files",
         "hostPath": {
-          "path": "/etc/kubernetes"
+          "path": "/etc/kubernetes/controller-manager"
         }
       },
       {
