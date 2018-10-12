@@ -6,7 +6,7 @@ After=etcd.service
 [Service]
 Type=notify
 ExecStartPre=/usr/bin/etcdctl set /coreos.com/network/config '{ "Network": "{{ pod_cluster_ip_range }}", "Backend": {"Type": "vxlan"}}'
-ExecStart=/usr/bin/flanneld
+ExecStart=/usr/bin/flanneld -ip-masq
 Restart=always
 RestartSec=5s
 

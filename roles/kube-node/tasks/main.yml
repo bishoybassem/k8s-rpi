@@ -28,6 +28,11 @@
     - cgroup_enable=memory
     - cgroup_memory=1
 
+- name: Install conntrack from apt
+  apt:
+    name: conntrack
+    update_cache: yes
+
 - name: Copy hyperkube binary
   copy: 
     src: downloads/hyperkube
