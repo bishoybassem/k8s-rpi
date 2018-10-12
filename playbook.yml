@@ -2,6 +2,7 @@
   become: yes
   vars:
     pod_cluster_ip_range: 10.5.0.0/16
+    dns_service_cluster_ip: 10.0.0.2
   roles:
     - docker
     - etcd

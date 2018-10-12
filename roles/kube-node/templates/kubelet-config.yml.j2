@@ -1,0 +1,6 @@
+kind: KubeletConfiguration
+apiVersion: kubelet.config.k8s.io/v1beta1
+cgroupDriver: cgroupfs
+kubeletCgroups: /systemd/system.slice
+staticPodPath: /etc/kubernetes/manifests
+clusterDNS: [{{ dns_service_cluster_ip }}]

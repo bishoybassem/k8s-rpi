@@ -15,7 +15,8 @@
     dest: "{{ item.dest }}"
     mode: 0644
   with_items:
-    - { src: kubeconfig.yml, dest: /etc/kubernetes/kubelet-kubeconfig.yml }
+    - { src: kubeconfig.yml, dest: /etc/kubernetes/kubelet/kubeconfig.yml }
+    - { src: kubeconfig.yml, dest: /etc/kubernetes/kube-proxy/kubeconfig.yml }
     - { src: kubeconfig.yml, dest: /root/.kube/config }
 
 - name: Generate rsa private key for tls certificate

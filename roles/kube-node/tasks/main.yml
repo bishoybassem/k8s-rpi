@@ -39,18 +39,34 @@
     dest: /usr/bin
     mode: 0755
 
-- name: Add kubelet systemd service
+- name: Add kubelet and kube-proxy systemd services
   copy: 
-    src: kubelet.service
+    src: "{{ item }}"
     dest: /etc/systemd/system
     mode: 0644
+  with_items:
+    - kubelet.service
+    - kube-proxy.service
 
-- name: Enable kubelet systemd service
+- name: Enable kubelet and kube-proxy systemd services
   service:
-    name: kubelet
+    name: "{{ item }}"
     enabled: yes
+  with_items:
+    - kubelet
+    - kube-proxy
 
-- name: Create manifests directory
+- name: Create directories
   file:
-    path: /etc/kubernetes/manifests
+    path: "{{ item }}"
     state: directory
+  with_items:
+    - /etc/kubernetes/manifests
+    - /etc/kubernetes/kubelet
+    - /etc/kubernetes/kube-proxy
+
+- name: Copy kubelet config
+  template:
+    src: kubelet-config.yml.j2
+    dest: /etc/kubernetes/kubelet/config.yml
+    mode: 0644
