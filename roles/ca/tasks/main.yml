@@ -1,0 +1,16 @@
+- name: Generate CA private key
+  shell: openssl genrsa -out /etc/ssl/private/ca.key
+  args:
+    creates: /etc/ssl/private/ca.key
+
+- name: Generate root certificate
+  shell: openssl req -x509 -new -nodes -key private/ca.key -subj "/CN={{ ansible_default_ipv4.address }}" -days 10000 -out certs/ca.crt
+  args:
+    chdir: /etc/ssl
+    creates: /etc/ssl/certs/ca.crt
+
+- name: Fetch root certificate
+  fetch:
+    src: /etc/ssl/certs/ca.crt
+    dest: /tmp/kube_ca.crt
+    flat: true

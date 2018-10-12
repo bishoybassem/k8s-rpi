@@ -9,17 +9,6 @@
     path: /root/.kube
     state: directory
 
-- name: Copy pods and tokens
-  template: 
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-    mode: "{{ item.mode }}"
-  with_items:
-    - { src: known-tokens.csv.j2, dest: /etc/kubernetes/known-tokens.csv, mode: "600" }
-    - { src: kube-apiserver.json.j2, dest: /etc/kubernetes/manifests/kube-apiserver.json, mode: "644" }
-    - { src: kube-controller-manager.json.j2, dest: /etc/kubernetes/manifests/kube-controller-manager.json, mode: "644" }
-    - { src: kube-scheduler.json.j2, dest: /etc/kubernetes/manifests/kube-scheduler.json, mode: "644" }
-
 - name: Copy kubeconfig
   copy:
     src: "{{ item.src }}"
@@ -28,6 +17,25 @@
   with_items:
     - { src: kubeconfig.yml, dest: /etc/kubernetes/kubelet-kubeconfig.yml }
     - { src: kubeconfig.yml, dest: /root/.kube/config }
+
+- name: Generate rsa private key for tls certificate
+  shell: openssl genrsa -out /etc/kubernetes/apiserver.key
+  args:
+    creates: /etc/kubernetes/apiserver.key
+
+- name: Copy config file for generating csr
+  template:
+    src: csr.conf.j2
+    dest: /etc/kubernetes/csr.conf
+    mode: 0644
+
+- name: Generate tls certificate
+  shell: |
+    openssl req -new -key apiserver.key -out apiserver.csr -config csr.conf
+    openssl x509 -req -in apiserver.csr -CA /etc/ssl/certs/ca.crt -CAkey /etc/ssl/private/ca.key -CAcreateserial -out apiserver.crt -days 10000 -extensions v3_ext -extfile csr.conf
+  args:
+    chdir: /etc/kubernetes
+    creates: /etc/kubernetes/apiserver.crt
 
 - name: Generate rsa private key for service accounts
   shell: openssl genrsa -out /etc/kubernetes/service-accounts-private.pem
@@ -38,3 +46,14 @@
   shell: openssl rsa -in /etc/kubernetes/service-accounts-private.pem -outform PEM -pubout -out /etc/kubernetes/service-accounts-public.pem
   args:
     creates: /etc/kubernetes/service-accounts-public.pem
+
+- name: Copy pods and tokens
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  with_items:
+    - { src: known-tokens.csv.j2, dest: /etc/kubernetes/known-tokens.csv, mode: "600" }
+    - { src: kube-apiserver.json.j2, dest: /etc/kubernetes/manifests/kube-apiserver.json, mode: "644" }
+    - { src: kube-controller-manager.json.j2, dest: /etc/kubernetes/manifests/kube-controller-manager.json, mode: "644" }
+    - { src: kube-scheduler.json.j2, dest: /etc/kubernetes/manifests/kube-scheduler.json, mode: "644" }

@@ -26,6 +26,11 @@
   register: kube_proxy_token
   changed_when: False
 
+- name: Transfer root certificate
+  copy:
+    src: /tmp/kube_ca.crt
+    dest: /etc/ssl/certs/ca.crt
+
 - name: Copy kubeconfig
   template: 
     src: "{{ item.src }}"
