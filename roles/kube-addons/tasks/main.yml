@@ -1,0 +1,10 @@
+- name: Create addons directory
+  file:
+    path: /etc/kubernetes/addons
+    state: directory
+
+- name: Copy dns addon
+  template:
+    src: coredns.yml.j2
+    dest: /etc/kubernetes/addons/coredns.yml
+    mode: 0644
