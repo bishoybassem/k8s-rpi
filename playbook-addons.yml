@@ -1,0 +1,5 @@
+- name: Setup cluster addons
+  hosts: master
+  become: yes
+  roles:
+    - kube-dns

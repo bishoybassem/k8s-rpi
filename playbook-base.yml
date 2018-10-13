@@ -1,0 +1,29 @@
+- name: Setup required tools for a base kubernetes node
+  hosts: all
+  become: yes
+  roles:
+    - docker
+    - etcd
+    - flannel
+    - docker-with-flannel
+    - kube-node
+
+- name: Generate root ca on the master node
+  hosts: master
+  become: yes
+  roles:
+    - ca
+
+- name: Setup worker nodes
+  hosts: worker_nodes
+  become: yes
+  vars:
+    master_ip: "{{ hostvars['master'].ansible_default_ipv4.address }}"
+  roles:
+    - kube-worker
+
+- name: Setup master node
+  hosts: master
+  become: yes
+  roles:
+    - kube-master
