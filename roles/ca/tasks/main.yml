@@ -1,16 +1,28 @@
-- name: Generate CA private key
-  shell: openssl genrsa -out /etc/ssl/private/ca.key
-  args:
-    creates: /etc/ssl/private/ca.key
+- when: inventory_hostname  == "master"
+  block:
+  - name: Generate CA private key
+    shell: openssl genrsa -out /etc/ssl/private/ca.key
+    args:
+      creates: /etc/ssl/private/ca.key
 
-- name: Generate root certificate
-  shell: openssl req -x509 -new -nodes -key private/ca.key -subj "/CN={{ ansible_default_ipv4.address }}" -days 10000 -out certs/ca.crt
-  args:
-    chdir: /etc/ssl
-    creates: /etc/ssl/certs/ca.crt
+  - name: Generate root certificate
+    shell: openssl req -x509 -new -nodes -key private/ca.key -subj "/CN={{ ansible_default_ipv4.address }}" -days 10000 -out certs/ca.crt
+    args:
+      chdir: /etc/ssl
+      creates: certs/ca.crt
 
-- name: Fetch root certificate
-  fetch:
-    src: /etc/ssl/certs/ca.crt
-    dest: /tmp/kube_ca.crt
-    flat: true
+  - name: Fetch root certificate
+    fetch:
+      src: /etc/ssl/certs/ca.crt
+      dest: /tmp/kube_ca.crt
+      flat: true
+
+- name: Transfer root certificate
+  copy:
+    src: /tmp/kube_ca.crt
+    dest: /usr/local/share/ca-certificates/ca.crt
+
+- name: Install the certificate
+  shell: update-ca-certificates
+  register: install_result
+  changed_when: "'0 added, 0 removed' not in install_result.stdout"

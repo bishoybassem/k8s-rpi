@@ -1,0 +1,58 @@
+- when: inventory_hostname  == "master"
+  block:
+  - name: Create registry addon directory
+    file:
+      path: /etc/kubernetes/addons/registry
+      state: directory
+
+  - name: Copy registry persistent volume yml file
+    copy:
+      src: registry-pv.yml
+      dest: /etc/kubernetes/addons/registry
+      mode: 0644
+
+  - name: Copy registry yml file
+    template:
+      src: registry.yml.j2
+      dest: /etc/kubernetes/addons/registry/registry.yml
+      mode: 0644
+
+  - name: Copy config file for generating csr
+    template:
+      src: csr.conf.j2
+      dest: /etc/kubernetes/addons/registry/csr.conf
+      mode: 0644
+
+  - name: Generate tls key and certificate
+    shell: |
+      openssl genrsa -out tls.key
+      openssl req -new -key tls.key -out tls.csr -config csr.conf
+      openssl x509 -req -in tls.csr -CA /etc/ssl/certs/ca.crt -CAkey /etc/ssl/private/ca.key -CAcreateserial -out tls.crt -days 10000 -extensions v3_ext -extfile csr.conf
+    args:
+      chdir: /etc/kubernetes/addons/registry
+      creates: tls.crt
+
+  - name: Create registry secret with tls key and certificate
+    shell: kubectl create secret tls registry-tls --key tls.key --cert tls.crt
+    args:
+      chdir: /etc/kubernetes/addons/registry
+    changed_when: kubectl_result.rc == 0
+    ignore_errors: yes
+
+  - name: Create registry persistent volume
+    shell: kubectl create -f /etc/kubernetes/addons/registry/registry-pv.yml
+    register: kubectl_result
+    changed_when: kubectl_result.rc == 0
+    ignore_errors: yes
+
+  - name: Create registry
+    shell: kubectl create -f /etc/kubernetes/addons/registry/registry.yml
+    register: kubectl_result
+    changed_when: kubectl_result.rc == 0
+    ignore_errors: yes
+
+- name: Add registry domain name to /etc/hosts
+  lineinfile:
+    path: /etc/hosts
+    regexp: "{{ registry_service_domain_name }}"
+    line: "{{ registry_service_cluster_ip }} {{ registry_service_domain_name }}"

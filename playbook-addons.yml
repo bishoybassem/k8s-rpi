@@ -1,5 +1,11 @@
-- name: Setup cluster addons
+- name: Setup dns addon
   hosts: master
   become: yes
   roles:
     - kube-dns
+
+- name: Setup docker registry addon
+  hosts: all
+  become: yes
+  roles:
+    - kube-registry

@@ -11,4 +11,6 @@
 
 - name: Create dns addon
   shell: kubectl create -f /etc/kubernetes/addons/coredns.yml
+  register: kubectl_result
+  changed_when: kubectl_result.rc == 0
   ignore_errors: yes

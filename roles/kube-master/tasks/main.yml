@@ -27,24 +27,20 @@
     - apiserver
     - controller-manager
 
-- name: Generate rsa private key for tls certificate
-  shell: openssl genrsa -out /etc/kubernetes/apiserver/tls.key
-  args:
-    creates: /etc/kubernetes/apiserver/tls.key
-
 - name: Copy config file for generating csr
   template:
     src: csr.conf.j2
     dest: /etc/kubernetes/apiserver/csr.conf
     mode: 0644
 
-- name: Generate tls certificate
+- name: Generate tls key and certificate
   shell: |
+    openssl genrsa -out tls.key
     openssl req -new -key tls.key -out tls.csr -config csr.conf
     openssl x509 -req -in tls.csr -CA /etc/ssl/certs/ca.crt -CAkey /etc/ssl/private/ca.key -CAcreateserial -out tls.crt -days 10000 -extensions v3_ext -extfile csr.conf
   args:
     chdir: /etc/kubernetes/apiserver
-    creates: /etc/kubernetes/apiserver/tls.crt
+    creates: tls.crt
 
 - name: Generate rsa private key for service accounts
   shell: openssl genrsa -out /etc/kubernetes/controller-manager/sa-private.pem
@@ -55,7 +51,7 @@
   shell: openssl rsa -in controller-manager/sa-private.pem -outform PEM -pubout -out apiserver/sa-public.pem
   args:
     chdir: /etc/kubernetes
-    creates: /etc/kubernetes/apiserver/sa-public.pem
+    creates: apiserver/sa-public.pem
 
 - name: Copy pods and tokens
   template:

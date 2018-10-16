@@ -6,13 +6,8 @@
     - etcd
     - flannel
     - docker-with-flannel
-    - kube-node
-
-- name: Generate root ca on the master node
-  hosts: master
-  become: yes
-  roles:
     - ca
+    - kube-node
 
 - name: Setup worker nodes
   hosts: worker_nodes
