@@ -1,4 +1,40 @@
 apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: registry-pv
+  labels:
+    type: local
+spec:
+  storageClassName: local-storage
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Delete
+  hostPath:
+    path: /var/lib/registry
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - {{ hostvars['master'].ansible_hostname }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: registry-pvc
+spec:
+  storageClassName: local-storage
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
 kind: Service
 metadata:
   name: registry
@@ -37,15 +73,15 @@ spec:
         - name: REGISTRY_HTTP_TLS_KEY
           value: "/tls/tls.key"
         volumeMounts:
-        - name: registry-persistent-storage
+        - name: registry-data
           mountPath: /var/lib/registry
-        - name: registry-tls-volume
+        - name: registry-tls-data
           mountPath: "/tls"
           readOnly: true
       volumes:
-      - name: registry-persistent-storage
+      - name: registry-data
         persistentVolumeClaim:
-          claimName: registry-pv-claim
-      - name: registry-tls-volume
+          claimName: registry-pvc
+      - name: registry-tls-data
         secret:
           secretName: registry-tls

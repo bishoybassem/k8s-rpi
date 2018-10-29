@@ -1,15 +1,12 @@
 - when: inventory_hostname  == "master"
   block:
-  - name: Create registry addon directory
+  - name: Create registry addon and data directories
     file:
-      path: /etc/kubernetes/addons/registry
+      path: "{{ item }}"
       state: directory
-
-  - name: Copy registry persistent volume yml file
-    copy:
-      src: registry-pv.yml
-      dest: /etc/kubernetes/addons/registry
-      mode: 0644
+    with_items:
+      - /etc/kubernetes/addons/registry
+      - /var/lib/registry
 
   - name: Copy registry yml file
     template:
@@ -36,12 +33,6 @@
     shell: kubectl create secret tls registry-tls --key tls.key --cert tls.crt
     args:
       chdir: /etc/kubernetes/addons/registry
-    changed_when: kubectl_result.rc == 0
-    ignore_errors: yes
-
-  - name: Create registry persistent volume
-    shell: kubectl create -f /etc/kubernetes/addons/registry/registry-pv.yml
-    register: kubectl_result
     changed_when: kubectl_result.rc == 0
     ignore_errors: yes
 
