@@ -35,6 +35,15 @@ spec:
       storage: 1Gi
 ---
 apiVersion: v1
+kind: Secret
+metadata:
+  name: registry-tls
+type: tls
+data:
+  tls.crt: {{ registry_tls_crt }}
+  tls.key: {{ registry_tls_key }}
+---
+apiVersion: v1
 kind: Service
 metadata:
   name: registry

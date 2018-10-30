@@ -8,12 +8,6 @@
       - /etc/kubernetes/addons/registry
       - /var/lib/registry
 
-  - name: Copy registry yml file
-    template:
-      src: registry.yml.j2
-      dest: /etc/kubernetes/addons/registry/registry.yml
-      mode: 0644
-
   - name: Copy config file for generating csr
     template:
       src: csr.conf.j2
@@ -29,18 +23,27 @@
       chdir: /etc/kubernetes/addons/registry
       creates: tls.crt
 
-  - name: Create registry secret with tls key and certificate
-    shell: kubectl create secret tls registry-tls --key tls.key --cert tls.crt
+  - name: Read tls key and certificate
+    shell: cat {{ item }} | base64 | tr -d '\n'
     args:
       chdir: /etc/kubernetes/addons/registry
-    changed_when: kubectl_result.rc == 0
-    ignore_errors: yes
+    changed_when: false
+    register: tls_output
+    with_items:
+      - tls.key
+      - tls.crt
+
+  - name: Copy registry yml file
+    vars:
+      registry_tls_key: "{{ tls_output.results[0].stdout }}"
+      registry_tls_crt: "{{ tls_output.results[1].stdout }}"
+    template:
+      src: registry.yml.j2
+      dest: /etc/kubernetes/addons/registry/registry.yml
+      mode: 0600
 
   - name: Create registry
-    shell: kubectl create -f /etc/kubernetes/addons/registry/registry.yml
-    register: kubectl_result
-    changed_when: kubectl_result.rc == 0
-    ignore_errors: yes
+    shell: kubectl apply -f /etc/kubernetes/addons/registry/registry.yml
 
 - name: Add registry domain name to /etc/hosts
   lineinfile:
