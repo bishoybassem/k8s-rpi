@@ -60,9 +60,9 @@
     mode: "{{ item.mode }}"
   with_items:
     - { src: known-tokens.csv.j2, dest: /etc/kubernetes/apiserver/known-tokens.csv, mode: "600" }
-    - { src: kube-apiserver.json.j2, dest: /etc/kubernetes/manifests/kube-apiserver.json, mode: "644" }
-    - { src: kube-controller-manager.json.j2, dest: /etc/kubernetes/manifests/kube-controller-manager.json, mode: "644" }
-    - { src: kube-scheduler.json.j2, dest: /etc/kubernetes/manifests/kube-scheduler.json, mode: "644" }
+    - { src: kube-apiserver.yml.j2, dest: /etc/kubernetes/manifests/kube-apiserver.yml, mode: "644" }
+    - { src: kube-controller-manager.yml.j2, dest: /etc/kubernetes/manifests/kube-controller-manager.yml, mode: "644" }
+    - { src: kube-scheduler.yml.j2, dest: /etc/kubernetes/manifests/kube-scheduler.yml, mode: "644" }
 
 - name: Create directory for pods
   file:

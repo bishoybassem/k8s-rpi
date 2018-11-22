@@ -1,0 +1,46 @@
+---
+kind: Pod
+apiVersion: v1
+metadata:
+  name: kube-apiserver
+spec:
+  hostNetwork: true
+  containers:
+  - name: kube-apiserver
+    image: "{{ hyperkube_image_name }}:{{ hyperkube_image_tag }}"
+    command:
+    - /hyperkube
+    - apiserver
+    - "--etcd-servers=http://127.0.0.1:2379"
+    - "--bind-address={{ ansible_default_ipv4.address }}"
+    - "--service-cluster-ip-range={{ service_cluster_ip_range }}"
+    - "--token-auth-file=/etc/kubernetes/apiserver/known-tokens.csv"
+    - "--authorization-mode=Node,RBAC"
+    - "--enable-admission-plugins=NodeRestriction"
+    - "--client-ca-file=/etc/ssl/certs/ca.crt"
+    - "--tls-cert-file=/etc/kubernetes/apiserver/tls.crt"
+    - "--tls-private-key-file=/etc/kubernetes/apiserver/tls.key"
+    - "--service-account-key-file=/etc/kubernetes/apiserver/sa-public.pem"
+    - "--v=2"
+    volumeMounts:
+    - name: apiserver-config-files
+      mountPath: "/etc/kubernetes/apiserver"
+      readOnly: true
+    - name: ssl
+      mountPath: "/etc/ssl"
+      readOnly: true
+    livenessProbe:
+      httpGet:
+        scheme: HTTP
+        host: 127.0.0.1
+        port: 8080
+        path: "/healthz"
+      initialDelaySeconds: 90
+      timeoutSeconds: 15
+  volumes:
+  - name: apiserver-config-files
+    hostPath:
+      path: "/etc/kubernetes/apiserver"
+  - name: ssl
+    hostPath:
+      path: "/etc/ssl"
