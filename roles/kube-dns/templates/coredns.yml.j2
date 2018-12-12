@@ -85,11 +85,6 @@ spec:
         k8s-app: kube-dns
     spec:
       serviceAccountName: coredns
-      tolerations:
-        - key: node-role.kubernetes.io/master
-          effect: NoSchedule
-        - key: "CriticalAddonsOnly"
-          operator: "Exists"
       containers:
       - name: coredns
         image: coredns/coredns:1.2.2

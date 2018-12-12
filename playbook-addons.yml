@@ -1,3 +1,11 @@
+- name: Configure master node
+  hosts: master
+  become: yes
+  tasks:
+    - name: Avoid scheduling pods on master node
+      shell: kubectl taint nodes {{ ansible_hostname }} node-role.kubernetes.io/master=true:PreferNoSchedule
+      ignore_errors: yes
+
 - name: Setup dns addon
   hosts: master
   become: yes

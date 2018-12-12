@@ -45,6 +45,10 @@
   - name: Create registry
     shell: kubectl apply -f /etc/kubernetes/addons/registry/registry.yml
 
+  - name: Wait for registry rollout
+    shell: kubectl rollout status deployment/registry
+    changed_when: false
+
 - name: Add registry domain name to /etc/hosts
   lineinfile:
     path: /etc/hosts

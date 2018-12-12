@@ -1,9 +1,9 @@
 #!/bin/bash
 
 ARCH=arm
-ETCD_VERSION=3.2.24
+ETCD_VERSION=3.2.25
 FLANNEL_VERSION=0.10.0
-KUBERNETES_VERSION=1.12.0
+KUBERNETES_VERSION=1.12.3
 
 CURRENT_PATH=$(pwd)
 
@@ -26,13 +26,13 @@ wget "https://github.com/coreos/flannel/releases/download/v${FLANNEL_VERSION}/fl
 mkdir -p ${CURRENT_PATH}/roles/kube-node/files/downloads
 cd ${CURRENT_PATH}/roles/kube-node/files/downloads
 wget "https://dl.k8s.io/v${KUBERNETES_VERSION}/kubernetes-server-linux-${ARCH}.tar.gz" -O kubernetes-server.tar.gz
-tar -xf kubernetes-server.tar.gz --wildcards *hyperkube
+tar -xf kubernetes-server.tar.gz --wildcards "*hyperkube"
 find . -name hyperkube | xargs -i mv {} .
 rm -rf kubernetes*
 
 mkdir -p ${CURRENT_PATH}/roles/kube-master/files/downloads
 cd ${CURRENT_PATH}/roles/kube-master/files/downloads
 wget "https://dl.k8s.io/v${KUBERNETES_VERSION}/kubernetes-client-linux-${ARCH}.tar.gz" -O kubernetes-client.tar.gz
-tar -xf kubernetes-client.tar.gz --wildcards *kubectl
+tar -xf kubernetes-client.tar.gz --wildcards "*kubectl"
 find . -name kubectl | xargs -i mv {} .
 rm -rf kubernetes*
