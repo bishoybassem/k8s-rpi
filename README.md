@@ -1,5 +1,5 @@
 # Kubernetes on Raspberry Pi
-The aim of this repo is to explore the installation process of Kubernetes, understand its components and how 
+The aim of this project is to explore the installation process of Kubernetes, understand its components and how 
 they interact together. The setup is based on the official [documentation](https://kubernetes.io/docs/setup/scratch) 
 for setting up a cluster from scratch. Moreover, Ansible is used to automate the installation steps. Finally, this setup is intended for testing and experimenting purposes only.
 
@@ -8,8 +8,9 @@ for setting up a cluster from scratch. Moreover, Ansible is used to automate the
 ## Requirements
 * At least 2 [Raspberry Pi](https://www.raspberrypi.org/products) devices with 
   [Raspbian OS](https://www.raspberrypi.org/downloads/raspbian). <br/>
-  (used: Raspberry Pi 3 Model B+ and Raspbian Stretch Lite 2018-10-09)
-* The Pis should have ssh enabled with sudo privileges, better with key based authentication. ([guide](https://www.raspberrypi.org/documentation/remote-access/ssh/))
+  (used: Raspberry Pi 3 Model B+ and Raspbian Stretch Lite 2018-11-13)
+* The Pis should have ssh enabled with sudo privileges, better with key based authentication. ([guide](https://www.raspberrypi.org/documentation/remote-access/ssh/))  
+  PS: a convenience script `install-os.sh` is added to simplify the OS installation to the SD card. It also configures the hostname, copies the WiFi network credentials to the card, configures SSH authorized access keys (and disables default password authentication in this case!), 
 * A control machine that has Ansible installed. (used version 2.7.0, [guide](https://docs.ansible.com/ansible/2.7/installation_guide/intro_installation.html))
 
 ## Steps
