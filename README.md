@@ -18,25 +18,26 @@ for setting up a cluster from scratch. Moreover, Ansible is used to automate the
 * Modify `hosts.yml`, and add there the hostnames of the Pis (names used in this setup are pi1, pi2 and pi3).
 * Run the base playbook with Ansible: <br/>
     ```bash
-       ansible-playbook -i hosts.yml playbook-base.yml
+    ansible-playbook -i hosts.yml playbook-base.yml
     ```
 * Restart the Pis.
 * Check the status of the cluster nodes and pods: <br/>
     ```bash
-       root@pi1:/home/pi# kubectl get nodes
-       NAME   STATUS   ROLES    AGE     VERSION
-       pi1    Ready    <none>   4d23h   v1.12.0
-       pi2    Ready    <none>   4d23h   v1.12.0
-       pi3    Ready    <none>   4d23h   v1.12.0
+    pi@pi1:~ $ kubectl get nodes
+    NAME   STATUS   ROLES    AGE   VERSION
+    pi1    Ready    <none>   74m   v1.13.4
+    pi2    Ready    <none>   74m   v1.13.4
+    pi3    Ready    <none>   74m   v1.13.4
+    pi4    Ready    <none>   74m   v1.13.4
     ```
     ```bash
-       root@pi1:/home/pi# kubectl get pods
-       NAME                          READY   STATUS    RESTARTS   AGE
-       kube-apiserver-pi1            1/1     Running   0          4d23h
-       kube-controller-manager-pi1   1/1     Running   0          4d23h
-       kube-scheduler-pi1            1/1     Running   0          4d23h
+    pi@pi1:~ $ kubectl get pods
+    NAME                          READY   STATUS    RESTARTS   AGE
+    kube-apiserver-pi1            1/1     Running   1          75m
+    kube-controller-manager-pi1   1/1     Running   2          75m
+    kube-scheduler-pi1            1/1     Running   1          75m
     ```
 * Optional: run the addons playbook: <br/>
     ```bash
-       ansible-playbook -i hosts.yml playbook-addons.yml
+    ansible-playbook -i hosts.yml playbook-addons.yml
     ```

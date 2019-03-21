@@ -3,4 +3,4 @@ etcd_cluster:
   {% for host in groups['all'] %}\
   {{ hosts.append(hostvars[host].ansible_hostname + '=http://' + hostvars[host].ansible_default_ipv4.address + ':2380') }}\
   {% endfor %}\
-  {{ hosts|join(',') }}"
+  {{ hosts | join(',') }}"

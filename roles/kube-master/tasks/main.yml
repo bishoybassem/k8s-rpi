@@ -1,5 +1,10 @@
+- name: Pull hyperkube docker image
+  command: docker pull {{ hyperkube_image_name }}:{{ hyperkube_image_tag }}
+  register: pull_result
+  changed_when: "'Image is up to date' not in pull_result.stdout"
+
 - name: Copy kubectl binary
-  copy: 
+  copy:
     src: downloads/kubectl
     dest: /usr/bin
     mode: 0755

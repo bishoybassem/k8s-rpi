@@ -1,16 +1,17 @@
 #!/bin/bash
 
 ARCH=arm
-ETCD_VERSION=3.2.25
-FLANNEL_VERSION=0.10.0
-KUBERNETES_VERSION=1.12.3
+ETCD_VERSION=3.2.24
+FLANNEL_VERSION=0.11.0
+KUBERNETES_VERSION=1.13.0
+GOLANG_VERSION=1.8.7
 
 CURRENT_PATH=$(pwd)
 
 TEMP_DIR=$(mktemp -d)
 mkdir -p ${CURRENT_PATH}/roles/etcd/files/downloads
 cd ${CURRENT_PATH}/roles/etcd/files/downloads
-docker run --interactive -v ${TEMP_DIR}:/etcdbin golang:1.8.7 /bin/bash -c \
+docker run --interactive -v ${TEMP_DIR}:/etcdbin golang:${GOLANG_VERSION} /bin/bash -c \
 	"git clone https://github.com/coreos/etcd /go/src/github.com/coreos/etcd \
 	&& cd /go/src/github.com/coreos/etcd \
 	&& git checkout v${ETCD_VERSION} \
