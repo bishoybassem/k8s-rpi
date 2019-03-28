@@ -20,22 +20,22 @@ for setting up a cluster from scratch. Moreover, Ansible is used to automate the
     ```bash
     ansible-playbook -i hosts.yml playbook-base.yml
     ```
-* Restart the Pis.
 * Check the status of the cluster nodes and pods: <br/>
     ```bash
     pi@pi1:~ $ kubectl get nodes
     NAME   STATUS   ROLES    AGE   VERSION
-    pi1    Ready    <none>   74m   v1.13.4
-    pi2    Ready    <none>   74m   v1.13.4
-    pi3    Ready    <none>   74m   v1.13.4
-    pi4    Ready    <none>   74m   v1.13.4
+    pi1    Ready    <none>   16m   v1.14.0
+    pi2    Ready    <none>   16m   v1.14.0
+    pi3    Ready    <none>   16m   v1.14.0
+    pi4    Ready    <none>   16m   v1.14.0
     ```
     ```bash
     pi@pi1:~ $ kubectl get pods
     NAME                          READY   STATUS    RESTARTS   AGE
-    kube-apiserver-pi1            1/1     Running   1          75m
-    kube-controller-manager-pi1   1/1     Running   2          75m
-    kube-scheduler-pi1            1/1     Running   1          75m
+    kube-apiserver-pi1            1/1     Running   1          16m
+    kube-controller-manager-pi1   1/1     Running   3          16m
+    kube-scheduler-pi1            1/1     Running   1          16m
+    registry-5db74645dc-mv86v     1/1     Running   1          15m
     ```
 * Optional: run the addons playbook: <br/>
     ```bash

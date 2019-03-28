@@ -1,5 +1,5 @@
 - name: Generate tokens for kubelet and kube-proxy users
-  shell: "openssl rand -out {{ item }} -hex 16"
+  command: openssl rand -out {{ item }} -hex 16
   args:
     creates: "{{ item }}"
   with_items:
@@ -17,12 +17,12 @@
     - /etc/kubernetes/kube-proxy/token
 
 - name: Read kubelet token
-  shell: cat /etc/kubernetes/kubelet/token
+  command: cat /etc/kubernetes/kubelet/token
   register: kubelet_token
   changed_when: False
 
 - name: Read kube-proxy token
-  shell: cat /etc/kubernetes/kube-proxy/token
+  command: cat /etc/kubernetes/kube-proxy/token
   register: kube_proxy_token
   changed_when: False
 

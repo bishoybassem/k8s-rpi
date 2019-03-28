@@ -7,13 +7,11 @@
 
 - name: Disable swapfile service
   service:
-    name: "{{ item }}"
+    name: dphys-swapfile
     enabled: no
-  with_items:
-    - dphys-swapfile
 
 - name: Read kernel command line parameters
-  shell: cat /boot/cmdline.txt
+  command: cat /boot/cmdline.txt
   register: cmdline
   changed_when: False
 

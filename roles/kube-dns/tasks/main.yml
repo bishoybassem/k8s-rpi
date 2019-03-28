@@ -10,8 +10,8 @@
     mode: 0644
 
 - name: Create dns addon
-  shell: kubectl apply -f /etc/kubernetes/addons/coredns.yml
+  command: kubectl apply -f /etc/kubernetes/addons/coredns.yml
 
 - name: Wait for coredns rollout
-  shell: kubectl rollout status --namespace kube-system deployment/coredns
+  command: kubectl rollout status --namespace kube-system deployment/coredns
   changed_when: false

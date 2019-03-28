@@ -17,7 +17,6 @@ spec:
     - "--token-auth-file=/etc/kubernetes/apiserver/known-tokens.csv"
     - "--authorization-mode=Node,RBAC"
     - "--enable-admission-plugins=NodeRestriction"
-    - "--client-ca-file=/etc/ssl/certs/ca.crt"
     - "--tls-cert-file=/etc/kubernetes/apiserver/tls.crt"
     - "--tls-private-key-file=/etc/kubernetes/apiserver/tls.key"
     - "--service-account-key-file=/etc/kubernetes/apiserver/sa-public.pem"

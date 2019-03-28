@@ -39,3 +39,4 @@
     until: workers_out.stdout_lines | length == groups['all'] | length
     retries: 30
     delay: 10
+    changed_when: false

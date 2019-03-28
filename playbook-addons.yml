@@ -2,9 +2,14 @@
   hosts: master
   become: yes
   tasks:
+    - name: Query master node taints
+      command: kubectl get nodes {{ ansible_hostname }} -o jsonpath --template '{range .spec.taints[*]}{.key}{"\n"}'
+      register: taints_out
+      changed_when: false
+
     - name: Avoid scheduling pods on master node
-      shell: kubectl taint nodes {{ ansible_hostname }} node-role.kubernetes.io/master=true:PreferNoSchedule
-      ignore_errors: yes
+      command: kubectl taint nodes {{ ansible_hostname }} node-role.kubernetes.io/master=true:PreferNoSchedule
+      when: "'node-role.kubernetes.io/master' not in taints_out.stdout"
 
 - name: Setup dns addon
   hosts: master

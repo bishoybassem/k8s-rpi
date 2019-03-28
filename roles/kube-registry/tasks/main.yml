@@ -14,10 +14,9 @@
       dest: /etc/kubernetes/addons/registry/csr.conf
       mode: 0644
 
-  - name: Generate tls key and certificate
+  - name: Generate tls private key and certificate
     shell: |
-      openssl genrsa -out tls.key
-      openssl req -new -key tls.key -out tls.csr -config csr.conf
+      openssl req -newkey rsa -nodes -keyout tls.key -new -config csr.conf -out tls.csr
       openssl x509 -req -in tls.csr -CA /etc/ssl/certs/ca.crt -CAkey /etc/ssl/private/ca.key -CAcreateserial -out tls.crt -days 10000 -extensions v3_ext -extfile csr.conf
     args:
       chdir: /etc/kubernetes/addons/registry
@@ -43,10 +42,10 @@
       mode: 0600
 
   - name: Create registry
-    shell: kubectl apply -f /etc/kubernetes/addons/registry/registry.yml
+    command: kubectl apply -f /etc/kubernetes/addons/registry/registry.yml
 
   - name: Wait for registry rollout
-    shell: kubectl rollout status deployment/registry
+    command: kubectl rollout status deployment/registry
     changed_when: false
 
 - name: Add registry domain name to /etc/hosts

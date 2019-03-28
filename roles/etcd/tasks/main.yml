@@ -12,6 +12,11 @@
     src: etcd.service.j2
     dest: /etc/systemd/system/etcd.service
     mode: 0644
+  vars:
+    etcd_cluster: |-
+      {% for host in groups['all'] %}
+      {{ hostvars[host].ansible_hostname }}=http://{{ hostvars[host].ansible_default_ipv4.address }}:2380{{ ',' if not loop.last else ''}}
+      {%- endfor %}
 
 - name: Enable systemd service
   service:

@@ -9,11 +9,6 @@
     dest: /usr/bin
     mode: 0755
 
-- name: Create home directory for kubectl
-  file:
-    path: /root/.kube
-    state: directory
-
 - name: Copy kubeconfig
   copy:
     src: "{{ item.src }}"
@@ -22,7 +17,6 @@
   with_items:
     - { src: kubeconfig.yml, dest: /etc/kubernetes/kubelet/kubeconfig.yml }
     - { src: kubeconfig.yml, dest: /etc/kubernetes/kube-proxy/kubeconfig.yml }
-    - { src: kubeconfig.yml, dest: /root/.kube/config }
 
 - name: Create apiserver and controller-manager directories
   file:
@@ -38,22 +32,18 @@
     dest: /etc/kubernetes/apiserver/csr.conf
     mode: 0644
 
-- name: Generate tls key and certificate
+- name: Generate tls private key and certificate
   shell: |
-    openssl genrsa -out tls.key
-    openssl req -new -key tls.key -out tls.csr -config csr.conf
+    openssl req -newkey rsa -nodes -keyout tls.key -new -config csr.conf -out tls.csr
     openssl x509 -req -in tls.csr -CA /etc/ssl/certs/ca.crt -CAkey /etc/ssl/private/ca.key -CAcreateserial -out tls.crt -days 10000 -extensions v3_ext -extfile csr.conf
   args:
     chdir: /etc/kubernetes/apiserver
     creates: tls.crt
 
-- name: Generate rsa private key for service accounts
-  shell: openssl genrsa -out /etc/kubernetes/controller-manager/sa-private.pem
-  args:
-    creates: /etc/kubernetes/controller-manager/sa-private.pem
-
-- name: Generate rsa public key for service accounts
-  shell: openssl rsa -in controller-manager/sa-private.pem -outform PEM -pubout -out apiserver/sa-public.pem
+- name: Generate rsa public and private keys for service accounts
+  shell: |
+    openssl genrsa -out controller-manager/sa-private.pem
+    openssl rsa -in controller-manager/sa-private.pem -outform PEM -pubout -out apiserver/sa-public.pem
   args:
     chdir: /etc/kubernetes
     creates: apiserver/sa-public.pem
