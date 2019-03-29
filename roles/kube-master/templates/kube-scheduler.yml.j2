@@ -7,7 +7,7 @@ spec:
   hostNetwork: true
   containers:
   - name: kube-scheduler
-    image: "{{ hyperkube_image_name }}:{{ hyperkube_image_tag }}"
+    image: "{{ hyperkube_image_name }}:{{ kubernetes_version }}"
     command:
     - /hyperkube
     - scheduler

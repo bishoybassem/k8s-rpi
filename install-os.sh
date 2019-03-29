@@ -7,7 +7,7 @@ fi
 
 os_image_path=$1
 if [ ! -f "$os_image_path" ]; then
-    echo "Please enter a valid path to the os image file!"
+    echo "Please enter a valid path to the os image file (zipped)!"
     exit 1
 fi
 
@@ -36,7 +36,7 @@ echo "Unmounting card partitions ..."
 umount -f ${sd_card_path}?* || true
 
 echo "Writing image to $sd_card_path ..."
-dd if=${os_image_path} of=${sd_card_path} bs=4M status=progress conv=fsync
+unzip -p ${os_image_path} | dd of=${sd_card_path} bs=4M status=progress conv=fsync
 
 echo "Mounting back the partitions ..."
 partprobe -s ${sd_card_path}

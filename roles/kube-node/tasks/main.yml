@@ -31,10 +31,31 @@
     name: conntrack
     update_cache: yes
 
-- name: Copy hyperkube binary
-  copy: 
-    src: downloads/hyperkube
-    dest: /usr/bin
+- delegate_to: localhost
+  run_once: true
+  become: false
+  block:
+    - name: Create download directory
+      file:
+        state: directory
+        dest: "{{ role_path }}/files/downloads"
+
+    - name: Download kubernetes server binaries
+      get_url:
+        url: https://dl.k8s.io/{{ kubernetes_version }}/kubernetes-server-linux-arm.tar.gz
+        dest: "{{ role_path }}/files/downloads/kubernetes-server-linux-arm-{{ kubernetes_version }}.tar.gz"
+
+    - name: Extract hyperkube
+      command: tar -xf kubernetes-server-linux-arm-{{ kubernetes_version }}.tar.gz --wildcards '*hyperkube' --transform 's/.*hyperkube/hyperkube-{{ kubernetes_version }}/'
+      args:
+        chdir: "{{ role_path }}/files/downloads"
+        creates: hyperkube-{{ kubernetes_version }}
+        warn: false
+
+- name: Copy hyperkube
+  copy:
+    src: downloads/hyperkube-{{ kubernetes_version }}
+    dest: /usr/bin/hyperkube
     mode: 0755
 
 - name: Add kubelet and kube-proxy systemd services

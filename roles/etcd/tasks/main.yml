@@ -1,11 +1,35 @@
+- delegate_to: localhost
+  run_once: true
+  become: false
+  block:
+    - name: Create download directory
+      file:
+        state: directory
+        dest: "{{ role_path }}/files/downloads"
+
+    - name: Build etcd binaries for armv7l in a golang docker container
+      shell: |
+        TEMP_DIR=$(mktemp -d)
+        docker run --interactive -v ${TEMP_DIR}:/etcdbin golang:{{ golang_version }} /bin/bash -c \
+          "git clone https://github.com/coreos/etcd /go/src/github.com/coreos/etcd \
+          && cd /go/src/github.com/coreos/etcd \
+          && git checkout {{ etcd_version }} \
+          && GOARM=7 GOARCH=arm ./build \
+          && cp -f bin/etcd* /etcdbin"
+        cp $TEMP_DIR/etcd etcd-{{ etcd_version }}
+        cp $TEMP_DIR/etcdctl etcdctl-{{ etcd_version }}
+      args:
+        chdir: "{{ role_path }}/files/downloads"
+        creates: etcd-{{ etcd_version }}
+
 - name: Copy binaries
   copy: 
-    src: "{{ item }}"
-    dest: /usr/bin
+    src: downloads/{{ item.src }}
+    dest: /usr/bin/{{ item.dest }}
     mode: 0755
   with_items:
-    - downloads/etcd
-    - downloads/etcdctl
+    - { src: "etcd-{{ etcd_version }}", dest: etcd }
+    - { src: "etcdctl-{{ etcd_version }}", dest: etcdctl }
 
 - name: Add systemd service
   template: 

@@ -1,0 +1,12 @@
+- name: Reboot all nodes
+  reboot:
+    pre_reboot_delay: 60
+
+- name: Wait for all nodes to join
+  when: inventory_hostname  == "master"
+  shell: kubectl get nodes | grep Ready
+  register: workers_out
+  until: workers_out.stdout_lines | length == groups['all'] | length
+  retries: 30
+  delay: 10
+  changed_when: false

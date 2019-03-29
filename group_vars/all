@@ -1,6 +1,9 @@
-hyperkube_image_name: k8s.gcr.io/hyperkube-arm
-hyperkube_image_tag: v1.14.0
+kubernetes_version: v1.14.0
 docker_version: 5:18.09.4~3-0~debian-stretch
+golang_version: 1.10.4
+etcd_version: v3.3.11
+flannel_version: v0.11.0
+hyperkube_image_name: k8s.gcr.io/hyperkube-arm
 service_cluster_ip_range: 10.0.0.0/24
 pod_cluster_ip_range: 10.5.0.0/16
 master_cluster_ip: 10.0.0.1
