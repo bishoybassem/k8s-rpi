@@ -3,6 +3,7 @@ kind: Pod
 apiVersion: v1
 metadata:
   name: kube-apiserver
+  namespace: kube-system
 spec:
   hostNetwork: true
   containers:
@@ -36,6 +37,7 @@ spec:
         path: "/healthz"
       initialDelaySeconds: 90
       timeoutSeconds: 15
+      periodSeconds: 30
   volumes:
   - name: apiserver-config-files
     hostPath:

@@ -42,10 +42,10 @@
       mode: 0600
 
   - name: Create registry
-    command: kubectl apply -f /etc/kubernetes/addons/registry/registry.yml
+    command: kubectl apply -f /etc/kubernetes/addons/registry/registry.yml -n kube-system
 
   - name: Wait for registry rollout
-    command: kubectl rollout status deployment/registry
+    command: kubectl rollout status deployment/registry -n kube-system
     changed_when: false
 
 - name: Add registry domain name to /etc/hosts

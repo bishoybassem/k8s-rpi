@@ -1,15 +1,15 @@
-apiVersion: v1
 kind: ServiceAccount
+apiVersion: v1
 metadata:
   name: coredns
   namespace: kube-system
 ---
-apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
 metadata:
+  name: system:coredns
   labels:
     kubernetes.io/bootstrapping: rbac-defaults
-  name: system:coredns
 rules:
 - apiGroups:
   - ""
@@ -22,14 +22,14 @@ rules:
   - list
   - watch
 ---
-apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  annotations:
-    rbac.authorization.kubernetes.io/autoupdate: "true"
+  name: system:coredns
   labels:
     kubernetes.io/bootstrapping: rbac-defaults
-  name: system:coredns
+  annotations:
+    rbac.authorization.kubernetes.io/autoupdate: "true"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -55,21 +55,18 @@ data:
           upstream
           fallthrough in-addr.arpa ip6.arpa
         }
-        proxy . /etc/resolv.conf
+        forward . /etc/resolv.conf
         cache 30
         loop
         reload
         loadbalance
     }
 ---
-apiVersion: extensions/v1beta1
 kind: Deployment
+apiVersion: apps/v1
 metadata:
   name: coredns
   namespace: kube-system
-  labels:
-    k8s-app: kube-dns
-    kubernetes.io/name: "CoreDNS"
 spec:
   replicas: 2
   strategy:
@@ -78,17 +75,16 @@ spec:
       maxUnavailable: 1
   selector:
     matchLabels:
-      k8s-app: kube-dns
+      app: coredns
   template:
     metadata:
       labels:
-        k8s-app: kube-dns
+        app: coredns
     spec:
       serviceAccountName: coredns
       containers:
       - name: coredns
-        image: coredns/coredns:1.4.0
-        imagePullPolicy: IfNotPresent
+        image: coredns/coredns:1.5.0
         resources:
           limits:
             memory: 170Mi
@@ -101,12 +97,13 @@ spec:
           mountPath: /etc/coredns
           readOnly: true
         ports:
-        - containerPort: 53
-          name: dns
+        - name: dns
+          containerPort: 53
           protocol: UDP
-        - containerPort: 53
-          name: dns-tcp
-          protocol: TCP
+        - name: dns-tcp
+          containerPort: 53
+        - name: http
+          containerPort: 8080
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -118,33 +115,25 @@ spec:
         livenessProbe:
           httpGet:
             path: /health
-            port: 8080
-            scheme: HTTP
+            port: http
           initialDelaySeconds: 60
           timeoutSeconds: 5
-          successThreshold: 1
-          failureThreshold: 5
       dnsPolicy: Default
       volumes:
-        - name: config-volume
-          configMap:
-            name: coredns
-            items:
-            - key: Corefile
-              path: Corefile
+      - name: config-volume
+        configMap:
+          name: coredns
 ---
-apiVersion: v1
 kind: Service
+apiVersion: v1
 metadata:
-  name: kube-dns
+  name: coredns
   namespace: kube-system
   labels:
-    k8s-app: kube-dns
-    kubernetes.io/cluster-service: "true"
-    kubernetes.io/name: "CoreDNS"
+    app: coredns
 spec:
   selector:
-    k8s-app: kube-dns
+    app: coredns
   clusterIP: {{ dns_service_cluster_ip }}
   ports:
   - name: dns
@@ -152,4 +141,3 @@ spec:
     protocol: UDP
   - name: dns-tcp
     port: 53
-    protocol: TCP

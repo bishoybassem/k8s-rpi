@@ -1,5 +1,12 @@
-apiVersion: v1
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: local-storage
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+---
 kind: PersistentVolume
+apiVersion: v1
 metadata:
   name: registry-pv
   labels:
@@ -9,9 +16,8 @@ spec:
   capacity:
     storage: 1Gi
   accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Delete
-  hostPath:
+  - ReadWriteOnce
+  local:
     path: /var/lib/registry
   nodeAffinity:
     required:
@@ -22,8 +28,8 @@ spec:
           values:
           - {{ hostvars['master'].ansible_hostname }}
 ---
-apiVersion: v1
 kind: PersistentVolumeClaim
+apiVersion: v1
 metadata:
   name: registry-pvc
 spec:
@@ -34,8 +40,8 @@ spec:
     requests:
       storage: 1Gi
 ---
-apiVersion: v1
 kind: Secret
+apiVersion: v1
 metadata:
   name: registry-tls
 type: tls
@@ -43,21 +49,21 @@ data:
   tls.crt: {{ registry_tls_crt }}
   tls.key: {{ registry_tls_key }}
 ---
-apiVersion: v1
 kind: Service
+apiVersion: v1
 metadata:
   name: registry
 spec:
   ports:
   - name: https
     port: 443
-    targetPort: 5000
+    targetPort: https
   selector:
     app: registry
   clusterIP: {{ registry_service_cluster_ip }}
 ---
-apiVersion: apps/v1
 kind: Deployment
+apiVersion: apps/v1
 metadata:
   name: registry
 spec:
@@ -72,20 +78,21 @@ spec:
         app: registry
     spec:
       containers:
-      - image: apcheamitru/arm32v7-registry:2.7.0
-        name: registry
+      - name: registry
+        image: registry:2.7.1
         ports:
-        - containerPort: 5000
+        - name: https
+          containerPort: 5000
         env:
         - name: REGISTRY_HTTP_TLS_CERTIFICATE
-          value: "/tls/tls.crt"
+          value: /tls/tls.crt
         - name: REGISTRY_HTTP_TLS_KEY
-          value: "/tls/tls.key"
+          value: /tls/tls.key
         volumeMounts:
         - name: registry-data
           mountPath: /var/lib/registry
         - name: registry-tls-data
-          mountPath: "/tls"
+          mountPath: /tls
           readOnly: true
       volumes:
       - name: registry-data
