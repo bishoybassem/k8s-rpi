@@ -1,7 +1,7 @@
 # Kubernetes on Raspberry Pi
 The aim of this project is to explore the installation process of Kubernetes, understand its components and how 
-they interact together. The setup is based on the official [documentation](https://kubernetes.io/docs/setup/scratch) 
-for setting up a cluster from scratch. Moreover, Ansible is used to automate the installation steps. Finally, this setup is intended for testing and experimenting purposes only.
+they interact together. The setup is based on the official [documentation](https://v1-12.docs.kubernetes.io/docs/setup/scratch/) 
+for setting up a cluster from scratch (without kubeadm). Moreover, Ansible is used to automate the installation steps. Finally, this setup is intended for testing and experimenting purposes only.
 
 ![screen1](pis.jpg)
 
@@ -18,11 +18,11 @@ for setting up a cluster from scratch. Moreover, Ansible is used to automate the
 ## Steps
 1. Clone the repository, and navigate to the clone directory.
 2. Modify `hosts.yml`, and add there the hostnames of the Pis (names used in this setup are pi1, pi2, pi3 and pi4).
-3. Run the base playbook with Ansible: <br/>
+3. Run the base playbook with Ansible:
     ```bash
     ansible-playbook -i hosts.yml playbook-base.yml
     ```
-4. Check the status of the cluster nodes and pods: <br/>
+4. Check the status of the cluster nodes and pods:
     ```bash
     pi@pi1:~ $ kubectl get nodes
     NAME   STATUS   ROLES    AGE   VERSION
@@ -39,7 +39,7 @@ for setting up a cluster from scratch. Moreover, Ansible is used to automate the
     kube-scheduler-pi1            1/1     Running   1          16m
     registry-5db74645dc-mv86v     1/1     Running   1          15m
     ```
-5. Optional: run the addons playbook: <br/>
+5. Optional: run the addons playbook (sets up an in-cluster docker registry):
     ```bash
     ansible-playbook -i hosts.yml playbook-addons.yml
     ```

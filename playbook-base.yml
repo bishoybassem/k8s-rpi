@@ -28,3 +28,10 @@
   become: yes
   roles:
     - reboot
+
+- name: Configure the cluster
+  hosts: master
+  become: yes
+  roles:
+    - kube-cluster-config
+    - kube-dns

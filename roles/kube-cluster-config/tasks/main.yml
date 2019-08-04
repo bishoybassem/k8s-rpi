@@ -1,0 +1,10 @@
+- name: Add role label for master
+  command: kubectl label node {{ ansible_hostname }} node-role.kubernetes.io/master= --overwrite
+
+- name: Add role label for workers
+  command: kubectl label node {{ item }} node-role.kubernetes.io/worker= --overwrite
+  with_items:
+  - "{{ groups['worker_nodes'] }}"
+
+- name: Avoid scheduling pods on master node
+  command: kubectl taint nodes {{ ansible_hostname }} node-role.kubernetes.io/master=:PreferNoSchedule --overwrite

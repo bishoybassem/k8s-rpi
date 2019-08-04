@@ -3,15 +3,15 @@
     path: /etc/kubernetes/addons
     state: directory
 
-- name: Copy dns addon
+- name: Copy coredns manifest file
   template:
     src: coredns.yml.j2
     dest: /etc/kubernetes/addons/coredns.yml
     mode: 0644
 
-- name: Create dns addon
+- name: Apply coredns manifest file
   command: kubectl apply -f /etc/kubernetes/addons/coredns.yml
 
-- name: Wait for coredns rollout
+- name: Wait for coredns rollout to complete
   command: kubectl rollout status --namespace kube-system deployment/coredns
   changed_when: false

@@ -1,23 +1,4 @@
-- name: Configure master node
-  hosts: master
-  become: yes
-  tasks:
-    - name: Query master node taints
-      command: kubectl get nodes {{ ansible_hostname }} -o jsonpath --template '{range .spec.taints[*]}{.key}{"\n"}'
-      register: taints_out
-      changed_when: false
-
-    - name: Avoid scheduling pods on master node
-      command: kubectl taint nodes {{ ansible_hostname }} node-role.kubernetes.io/master=true:PreferNoSchedule
-      when: "'node-role.kubernetes.io/master' not in taints_out.stdout"
-
-- name: Setup dns addon
-  hosts: master
-  become: yes
-  roles:
-    - kube-dns
-
-- name: Setup docker registry addon
+- name: Setup a private docker registry
   hosts: all
   become: yes
   roles:
