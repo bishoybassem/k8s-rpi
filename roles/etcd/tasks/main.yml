@@ -22,27 +22,46 @@
         chdir: "{{ role_path }}/files/downloads"
         creates: etcd-{{ etcd_version }}
 
-- name: Copy binaries
-  copy: 
-    src: downloads/{{ item.src }}
-    dest: /usr/bin/{{ item.dest }}
+- name: Copy etcdctl binary
+  copy:
+    src: downloads/etcdctl-{{ etcd_version }}
+    dest: /usr/bin/etcdctl
     mode: 0755
-  with_items:
-    - { src: "etcd-{{ etcd_version }}", dest: etcd }
-    - { src: "etcdctl-{{ etcd_version }}", dest: etcdctl }
 
-- name: Add systemd service
-  template: 
-    src: etcd.service.j2
-    dest: /etc/systemd/system/etcd.service
-    mode: 0644
+- name: Define initial etcd cluster members list
+  set_fact:
+    etcd_members: ['master']
+
+- name: Construct etcd cluster members list
+  set_fact:
+    etcd_members: "{{ etcd_members + [item] }}"
+  when: "'etcd_cluster' in hostvars[item] and hostvars[item]['etcd_cluster']"
+  with_items: "{{ groups['worker_nodes'] }}"
+
+- when: inventory_hostname in etcd_members
   vars:
-    etcd_cluster: |-
-      {% for host in groups['all'] %}
+    etcd_cluster_urls: |-
+      {% for host in etcd_members %}
       {{ hostvars[host].ansible_hostname }}=http://{{ hostvars[host].ansible_default_ipv4.address }}:2380{{ ',' if not loop.last else ''}}
       {%- endfor %}
+  block:
+    - name: Copy etcd binary
+      copy:
+        src: downloads/etcd-{{ etcd_version }}
+        dest: /usr/bin/etcd
+        mode: 0755
 
-- name: Enable systemd service
-  service:
-    name: etcd
-    enabled: yes
+    - name: Add systemd service
+      template:
+        src: etcd.service.j2
+        dest: /etc/systemd/system/etcd.service
+        mode: 0644
+
+    - name: Enable systemd service
+      service:
+        name: etcd
+        enabled: yes
+
+    - name: Reload systemd units
+      systemd:
+        daemon_reload: yes

@@ -35,9 +35,9 @@ spec:
         host: 127.0.0.1
         port: 8080
         path: "/healthz"
-      initialDelaySeconds: 90
-      timeoutSeconds: 15
-      periodSeconds: 30
+      initialDelaySeconds: 120
+      timeoutSeconds: 20
+      periodSeconds: 60
   volumes:
   - name: apiserver-config-files
     hostPath:

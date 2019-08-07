@@ -33,3 +33,7 @@
   service:
     name: flannel
     enabled: yes
+
+- name: Reload systemd units
+  systemd:
+    daemon_reload: yes

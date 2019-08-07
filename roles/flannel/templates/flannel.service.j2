@@ -1,15 +1,14 @@
 [Unit]
 Description=Flannel Overlay Network for Kubernetes
-Requires=etcd.service
-After=etcd.service
+After=network.target
+StartLimitIntervalSec=0
 
 [Service]
 Type=notify
-ExecStartPre=/usr/bin/etcdctl set /coreos.com/network/config '{ "Network": "{{ pod_cluster_ip_range }}", "Backend": {"Type": "vxlan"}}'
-ExecStart=/usr/bin/flanneld -ip-masq
+ExecStartPre=/usr/bin/etcdctl --endpoints http://{{ hostvars['master'].ansible_default_ipv4.address }}:2379 set /coreos.com/network/config '{ "Network": "{{ pod_cluster_ip_range }}", "Backend": {"Type": "vxlan"}}'
+ExecStart=/usr/bin/flanneld -ip-masq -etcd-endpoints http://{{ hostvars['master'].ansible_default_ipv4.address }}:2379
 Restart=always
 RestartSec=5s
 
 [Install]
 WantedBy=multi-user.target
-

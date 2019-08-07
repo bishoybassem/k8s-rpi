@@ -6,7 +6,6 @@ After=network.target
 Type=notify
 Environment=ETCD_UNSUPPORTED_ARCH=arm
 Environment=HOST_IP={{ ansible_default_ipv4.address }}
-ExecStartPre=/bin/sleep 5s
 ExecStart=/bin/bash -c "/usr/bin/etcd --name $(hostname) \
   --data-dir /var/lib/etcd/data \
   --initial-advertise-peer-urls http://$HOST_IP:2380 \
@@ -14,7 +13,7 @@ ExecStart=/bin/bash -c "/usr/bin/etcd --name $(hostname) \
   --listen-client-urls http://$HOST_IP:2379,http://127.0.0.1:2379 \
   --advertise-client-urls http://$HOST_IP:2379 \
   --initial-cluster-token pi-cluster \
-  --initial-cluster {{ etcd_cluster }} \
+  --initial-cluster {{ etcd_cluster_urls }} \
   --initial-cluster-state new"
 Restart=always
 RestartSec=5s

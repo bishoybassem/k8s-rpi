@@ -25,19 +25,20 @@ for setting up a cluster from scratch (without kubeadm). Moreover, Ansible is us
 4. Check the status of the cluster nodes and pods:
     ```bash
     pi@pi1:~ $ kubectl get nodes
-    NAME   STATUS   ROLES    AGE   VERSION
-    pi1    Ready    <none>   16m   v1.14.0
-    pi2    Ready    <none>   16m   v1.14.0
-    pi3    Ready    <none>   16m   v1.14.0
-    pi4    Ready    <none>   16m   v1.14.0
+    NAME   STATUS   ROLES    AGE     VERSION
+    pi1    Ready    master   2m58s   v1.14.0
+    pi2    Ready    worker   2m58s   v1.14.0
+    pi3    Ready    worker   2m58s   v1.14.0
+    pi4    Ready    worker   2m58s   v1.14.0
     ```
     ```bash
-    pi@pi1:~ $ kubectl get pods
-    NAME                          READY   STATUS    RESTARTS   AGE
-    kube-apiserver-pi1            1/1     Running   1          16m
-    kube-controller-manager-pi1   1/1     Running   3          16m
-    kube-scheduler-pi1            1/1     Running   1          16m
-    registry-5db74645dc-mv86v     1/1     Running   1          15m
+    pi@pi1:~ $ kubectl get pods --all-namespaces
+    NAMESPACE     NAME                          READY   STATUS    RESTARTS   AGE
+    kube-system   coredns-c7cc68fc-gtxgp        1/1     Running   0          2m19s
+    kube-system   coredns-c7cc68fc-vm6hz        1/1     Running   0          2m19s
+    kube-system   kube-apiserver-pi1            1/1     Running   0          2m35s
+    kube-system   kube-controller-manager-pi1   1/1     Running   1          2m47s
+    kube-system   kube-scheduler-pi1            1/1     Running   0          2m19s
     ```
 5. Optional: run the addons playbook (sets up an in-cluster docker registry):
     ```bash

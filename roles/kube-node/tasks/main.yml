@@ -75,6 +75,10 @@
     - kubelet
     - kube-proxy
 
+- name: Reload systemd units
+  systemd:
+    daemon_reload: yes
+
 - name: Create directories
   file:
     path: "{{ item }}"
