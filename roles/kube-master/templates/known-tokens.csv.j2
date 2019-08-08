@@ -1,5 +1,6 @@
+{{ cluster_admin_token.stdout }},pi,1,system:masters
 {% set hosts = [] %}
 {% for host in groups['worker_nodes'] %}
-{{ hostvars[host].kubelet_token }},system:node:{{hostvars[host].ansible_hostname}},{{ loop.index }},system:nodes
-{{ hostvars[host].kube_proxy_token }},system:kube-proxy,1000{{ loop.index }}
+{{ hostvars[host].kubelet_token }},system:node:{{hostvars[host].ansible_hostname}},100{{ loop.index }},system:nodes
+{{ hostvars[host].kube_proxy_token }},system:kube-proxy,200{{ loop.index }}
 {% endfor %}

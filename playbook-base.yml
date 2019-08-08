@@ -12,8 +12,6 @@
 - name: Setup worker nodes
   hosts: worker_nodes
   become: yes
-  vars:
-    master_ip: "{{ hostvars['master'].ansible_default_ipv4.address }}"
   roles:
     - kube-worker
 

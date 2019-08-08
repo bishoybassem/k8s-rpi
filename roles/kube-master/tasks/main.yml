@@ -65,6 +65,23 @@
     chdir: /etc/kubernetes
     creates: apiserver/sa-public.pem
 
+- name: Generate token for cluster-admin user
+  command: openssl rand -out /etc/kubernetes/apiserver/cluster-admin-token -hex 16
+  args:
+    creates: /etc/kubernetes/apiserver/cluster-admin-token
+
+- name: Restrict access to token files
+  file:
+    path: /etc/kubernetes/apiserver/cluster-admin-token
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Read cluster-admin user token
+  command: cat /etc/kubernetes/apiserver/cluster-admin-token
+  register: cluster_admin_token
+  changed_when: False
+
 - name: Copy pods and tokens
   template:
     src: "{{ item.src }}"
@@ -75,9 +92,3 @@
     - { src: kube-apiserver.yml.j2, dest: /etc/kubernetes/manifests/kube-apiserver.yml, mode: "644" }
     - { src: kube-controller-manager.yml.j2, dest: /etc/kubernetes/manifests/kube-controller-manager.yml, mode: "644" }
     - { src: kube-scheduler.yml.j2, dest: /etc/kubernetes/manifests/kube-scheduler.yml, mode: "644" }
-
-- name: Create directory for pods
-  file:
-    path: /etc/kubernetes/pods
-    state: directory
-    mode: 0666
