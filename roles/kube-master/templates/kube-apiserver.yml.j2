@@ -11,7 +11,7 @@ spec:
     image: "{{ hyperkube_image_name }}:{{ kubernetes_version }}"
     command:
     - /hyperkube
-    - apiserver
+    - kube-apiserver
     - "--etcd-servers=http://127.0.0.1:2379"
     - "--bind-address={{ ansible_default_ipv4.address }}"
     - "--service-cluster-ip-range={{ service_cluster_ip_range }}"

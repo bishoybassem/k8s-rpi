@@ -1,8 +1,10 @@
-kubernetes_version: v1.14.0
-docker_version: 5:18.09.4~3-0~debian-stretch
+kubernetes_version: v1.15.2
+docker_version: 5:19.03.1~3-0~debian-{{ ansible_distribution_release }}
 golang_version: 1.10.4
-etcd_version: v3.3.11
+etcd_version: v3.3.13
 flannel_version: v0.11.0
+coredns_version: 1.6.1
+registry_version: 2.7.1
 hyperkube_image_name: k8s.gcr.io/hyperkube-arm
 service_cluster_ip_range: 10.0.0.0/24
 pod_cluster_ip_range: 10.5.0.0/16

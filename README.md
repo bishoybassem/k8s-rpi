@@ -8,7 +8,7 @@ for setting up a cluster from scratch (without kubeadm). Moreover, Ansible is us
 ## Requirements
 * At least 2 [Raspberry Pi](https://www.raspberrypi.org/products) devices with 
   [Raspbian OS](https://www.raspberrypi.org/downloads/raspbian). <br/>
-  (used: Raspberry Pi 3 Model B+ and Raspbian Stretch Lite 2018-11-13)
+  (used: Raspberry Pi 3 Model B+ and Raspbian Stretch Lite 2019-04-08)
 * The Pis should have ssh enabled with sudo privileges, better with key based authentication. ([guide](https://www.raspberrypi.org/documentation/remote-access/ssh/))  
   PS: a convenience script `install-os.sh` is added to simplify the OS installation to the SD card. It also configures the hostname, copies the WiFi network credentials to the card, configures SSH authorized access keys (and disables default password authentication in this case!). 
 * A control machine that has the following installed:
@@ -18,27 +18,27 @@ for setting up a cluster from scratch (without kubeadm). Moreover, Ansible is us
 ## Steps
 1. Clone the repository, and navigate to the clone directory.
 2. Modify `hosts.yml`, and add there the hostnames of the Pis (names used in this setup are pi1, pi2, pi3 and pi4).
-3. Run the base playbook with Ansible:
+3. Run the main Ansible playbook:
     ```bash
-    ansible-playbook -i hosts.yml playbook-base.yml
+    ansible-playbook -i hosts.yml playbook-main.yml
     ```
 4. Check the status of the cluster nodes and pods:
     ```bash
     pi@pi1:~ $ kubectl get nodes
-    NAME   STATUS   ROLES    AGE     VERSION
-    pi1    Ready    master   2m58s   v1.14.0
-    pi2    Ready    worker   2m58s   v1.14.0
-    pi3    Ready    worker   2m58s   v1.14.0
-    pi4    Ready    worker   2m58s   v1.14.0
+    NAME   STATUS   ROLES    AGE   VERSION
+    pi1    Ready    master   5m    v1.15.2
+    pi2    Ready    worker   5m    v1.15.2
+    pi3    Ready    worker   5m    v1.15.2
+    pi4    Ready    worker   5m    v1.15.2
     ```
     ```bash
     pi@pi1:~ $ kubectl get pods --all-namespaces
     NAMESPACE     NAME                          READY   STATUS    RESTARTS   AGE
-    kube-system   coredns-c7cc68fc-gtxgp        1/1     Running   0          2m19s
-    kube-system   coredns-c7cc68fc-vm6hz        1/1     Running   0          2m19s
-    kube-system   kube-apiserver-pi1            1/1     Running   0          2m35s
-    kube-system   kube-controller-manager-pi1   1/1     Running   1          2m47s
-    kube-system   kube-scheduler-pi1            1/1     Running   0          2m19s
+    kube-system   coredns-6b84c9556-zchxr       1/1     Running   0          4m17s
+    kube-system   coredns-6b84c9556-zrkmq       1/1     Running   0          4m17s
+    kube-system   kube-apiserver-pi1            1/1     Running   0          4m27s
+    kube-system   kube-controller-manager-pi1   1/1     Running   1          4m47s
+    kube-system   kube-scheduler-pi1            1/1     Running   0          4m24s
     ```
 5. Optional: run the addons playbook (sets up an in-cluster docker registry):
     ```bash

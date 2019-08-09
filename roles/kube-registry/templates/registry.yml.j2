@@ -79,7 +79,7 @@ spec:
     spec:
       containers:
       - name: registry
-        image: registry:2.7.1
+        image: registry:{{ registry_version }}
         ports:
         - name: https
           containerPort: 5000

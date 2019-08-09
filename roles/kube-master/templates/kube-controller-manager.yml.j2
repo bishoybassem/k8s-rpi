@@ -11,7 +11,7 @@ spec:
     image: "{{ hyperkube_image_name }}:{{ kubernetes_version }}"
     command:
     - /hyperkube
-    - controller-manager
+    - kube-controller-manager
     - "--master=127.0.0.1:8080"
     - "--root-ca-file=/etc/ssl/certs/ca.crt"
     - "--service-account-private-key-file=/etc/kubernetes/controller-manager/sa-private.pem"

@@ -11,7 +11,7 @@ spec:
     image: "{{ hyperkube_image_name }}:{{ kubernetes_version }}"
     command:
     - /hyperkube
-    - scheduler
+    - kube-scheduler
     - "--master=127.0.0.1:8080"
     - "--leader-elect=false"
     livenessProbe:
