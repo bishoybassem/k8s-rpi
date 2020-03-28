@@ -8,9 +8,8 @@ spec:
   hostNetwork: true
   containers:
   - name: kube-apiserver
-    image: "{{ hyperkube_image_name }}:{{ kubernetes_version }}"
+    image: "{{ image_name_apiserver }}:{{ kubernetes_version }}"
     command:
-    - /hyperkube
     - kube-apiserver
     - "--etcd-servers=http://127.0.0.1:2379"
     - "--bind-address={{ ansible_default_ipv4.address }}"

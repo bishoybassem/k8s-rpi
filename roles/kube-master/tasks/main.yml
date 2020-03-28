@@ -21,10 +21,14 @@
       - --no-same-owner
       - --strip-components=3
 
-- name: Pull hyperkube docker image
-  command: docker pull {{ hyperkube_image_name }}:{{ kubernetes_version }}
+- name: Pull apiserver, controller-manager and scheduler docker images
+  command: docker pull {{ item }}:{{ kubernetes_version }}
   register: pull_result
   changed_when: "'Image is up to date' not in pull_result.stdout"
+  with_items:
+    - "{{ image_name_apiserver }}"
+    - "{{ image_name_controller_manager }}"
+    - "{{ image_name_scheduler }}"
 
 - name: Copy kubeconfig
   copy:
@@ -92,3 +96,12 @@
     - { src: kube-apiserver.yml.j2, dest: /etc/kubernetes/manifests/kube-apiserver.yml, mode: "644" }
     - { src: kube-controller-manager.yml.j2, dest: /etc/kubernetes/manifests/kube-controller-manager.yml, mode: "644" }
     - { src: kube-scheduler.yml.j2, dest: /etc/kubernetes/manifests/kube-scheduler.yml, mode: "644" }
+
+- name: Configure kubectl
+  shell: |
+    kubectl config set-cluster rpi --server=https://{{ ansible_default_ipv4.address }}:6443
+    kubectl config set-credentials cluster-admin --token={{ cluster_admin_token.stdout }}
+    kubectl config set-context rpi --cluster=rpi --user=cluster-admin
+    kubectl config use-context rpi
+  args:
+    creates: ~/.kube/config

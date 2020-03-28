@@ -45,18 +45,24 @@
         url: https://dl.k8s.io/{{ kubernetes_version }}/kubernetes-server-linux-arm.tar.gz
         dest: "{{ role_path }}/files/downloads/kubernetes-server-linux-arm-{{ kubernetes_version }}.tar.gz"
 
-    - name: Extract hyperkube
-      command: tar -xf kubernetes-server-linux-arm-{{ kubernetes_version }}.tar.gz --wildcards '*hyperkube' --transform 's/.*hyperkube/hyperkube-{{ kubernetes_version }}/'
+    - name: Extract kubelet and kube-proxy
+      command: tar -xf kubernetes-server-linux-arm-{{ kubernetes_version }}.tar.gz --wildcards '*{{ item }}' --transform 's/.*{{ item }}/{{ item }}-{{ kubernetes_version }}/'
       args:
         chdir: "{{ role_path }}/files/downloads"
-        creates: hyperkube-{{ kubernetes_version }}
+        creates: "{{ item }}-{{ kubernetes_version }}"
         warn: false
+      with_items:
+        - kubelet
+        - kube-proxy
 
-- name: Copy hyperkube
+- name: Copy kubelet and kube-proxy
   copy:
-    src: downloads/hyperkube-{{ kubernetes_version }}
-    dest: /usr/bin/hyperkube
+    src: downloads/{{ item }}-{{ kubernetes_version }}
+    dest: /usr/bin/{{ item }}
     mode: 0755
+  with_items:
+    - kubelet
+    - kube-proxy
 
 - name: Add kubelet and kube-proxy systemd services
   copy: 

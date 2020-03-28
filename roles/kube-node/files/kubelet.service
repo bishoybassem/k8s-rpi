@@ -4,7 +4,7 @@ After=docker.service
 StartLimitIntervalSec=0
 
 [Service]
-ExecStart=/usr/bin/hyperkube kubelet \
+ExecStart=/usr/bin/kubelet \
   --config=/etc/kubernetes/kubelet/config.yml \
   --kubeconfig=/etc/kubernetes/kubelet/kubeconfig.yml
 Restart=always

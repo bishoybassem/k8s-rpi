@@ -8,9 +8,8 @@ spec:
   hostNetwork: true
   containers:
   - name: kube-controller-manager
-    image: "{{ hyperkube_image_name }}:{{ kubernetes_version }}"
+    image: "{{ image_name_controller_manager }}:{{ kubernetes_version }}"
     command:
-    - /hyperkube
     - kube-controller-manager
     - "--master=127.0.0.1:8080"
     - "--root-ca-file=/etc/ssl/certs/ca.crt"

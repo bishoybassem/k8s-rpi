@@ -8,9 +8,8 @@ spec:
   hostNetwork: true
   containers:
   - name: kube-scheduler
-    image: "{{ hyperkube_image_name }}:{{ kubernetes_version }}"
+    image: "{{ image_name_scheduler }}:{{ kubernetes_version }}"
     command:
-    - /hyperkube
     - kube-scheduler
     - "--master=127.0.0.1:8080"
     - "--leader-elect=false"

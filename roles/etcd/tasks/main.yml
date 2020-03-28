@@ -11,8 +11,8 @@
       shell: |
         TEMP_DIR=$(mktemp -d)
         docker run --interactive -v ${TEMP_DIR}:/etcdbin golang:{{ golang_version }} /bin/bash -c \
-          "git clone https://github.com/coreos/etcd /go/src/github.com/coreos/etcd \
-          && cd /go/src/github.com/coreos/etcd \
+          "git clone https://github.com/coreos/etcd /go/src/go.etcd.io/etcd \
+          && cd /go/src/go.etcd.io/etcd \
           && git checkout {{ etcd_version }} \
           && GOARM=7 GOARCH=arm ./build \
           && cp -f bin/etcd* /etcdbin"

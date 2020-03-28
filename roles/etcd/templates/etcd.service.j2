@@ -14,7 +14,8 @@ ExecStart=/bin/bash -c "/usr/bin/etcd --name $(hostname) \
   --advertise-client-urls http://$HOST_IP:2379 \
   --initial-cluster-token pi-cluster \
   --initial-cluster {{ etcd_cluster_urls }} \
-  --initial-cluster-state new"
+  --initial-cluster-state new \
+  --enable-v2"
 Restart=always
 RestartSec=5s
 
